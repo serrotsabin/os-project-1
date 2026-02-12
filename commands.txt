@@ -1,3 +1,0 @@
-awk -F, 'NR>1 {sum+=$4; count++} END {print "Mean:", sum/count}' appendix_latency_raw.txt
-
-awk -F, 'NR>1 {if(min==""||$4<min)min=$4; if($4>max)max=$4} END {print "Min:",min,"Max:",max}' appendix_latency_raw.txt

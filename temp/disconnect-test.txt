@@ -1,0 +1,44 @@
+# Step 1: Run the test
+gcc -o minimal_pty minimal_pty.c -lutil
+./minimal_pty
+
+# Step 2: Type this in the PTY:
+sleep 100 &
+
+# Step 3: You'll see:
+[1] 12345
+
+# Step 4: Press Ctrl+C (kills the PTY process)
+
+# Step 5: Check if sleep is still running:
+ps aux | grep sleep
+# You should see: sleep 100 (still running!)
+
+# Step 6: Kill it:
+killall sleep
+
+# Step 7: Document what you observed:
+cat > appendix/disconnect_test.log << 'EOF'
+
+
+Test 2: Foreground Disconnect (Quick)bash# Start PTY:
+./minimal_pty
+
+# Type these commands one by one:
+echo "test"
+# Output: test
+
+pwd
+# Output: /your/current/dir
+
+yes | head -10
+# Output: y repeated 10 times
+
+# Now press Ctrl+Q
+
+# Check for zombies:
+ps aux | grep defunct
+# Should see: nothing (clean)
+
+ps aux | grep bash
+# Should see: only your current shell, not the PTY bash
