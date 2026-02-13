@@ -8,7 +8,6 @@
 #define SOCKET_PATH "/tmp/cis_test.sock"
 
 int main() {
-    // Connect to server
     int sock = socket(AF_UNIX, SOCK_STREAM, 0);
     if (sock < 0) {
         perror("socket");
@@ -27,7 +26,6 @@ int main() {
     
     printf("[Observer] Connected! Watching session...\n");
     
-    // Just display everything from server
     char buf[4096];
     while (1) {
         int n = read(sock, buf, sizeof(buf));

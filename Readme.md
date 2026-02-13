@@ -108,4 +108,3 @@ cis_phase1/
 - Script 04 (latency) requires manual input for realistic measurements
 - Scripts 01 and 03 are fully automated
 - Socket path: `/tmp/cis_test.sock`
-- Phase 2 will add multiple observers and floor control
