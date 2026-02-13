@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <util.h>
+#include <pty.h>
 #include <sys/select.h>
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <string.h>
 #include <termios.h>
+#include <sys/stat.h>
 
 #define SOCKET_PATH "/tmp/cis_test.sock"
 
@@ -131,6 +132,7 @@ int main() {
 
     enable_raw_mode();
 
+    mkdir("appendix", 0755);
     FILE *ctrl_log = fopen("appendix/latency.txt", "w");
     FILE *bcast_log = fopen("appendix/broadcast_latency.txt", "w");
 
