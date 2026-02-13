@@ -1,0 +1,6 @@
+server
+client
+appendix/*.txt
+appendix/*.log
+*.o
+*.sock
