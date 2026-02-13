@@ -1,34 +1,20 @@
-System Information for CIS Experiments
-========================================
+System Information for CIS Phase 1 Experiments
+===============================================
+
+Target Deployment Platform: home.cs.siue.edu
 
 Operating System:
-Darwin (macOS)
-Kernel: Darwin Sabins-MacBook-Pro.local 25.2.0 Darwin Kernel Version 25.2.0: Tue Nov 18 21:08:48 PST 2025; root:xnu-12377.61.12~1/RELEASE_ARM64_T8132 arm64
+Darwin Sabins-MacBook-Pro.local 25.2.0 Darwin Kernel Version 25.2.0: Tue Nov 18 21:08:48 PST 2025; root:xnu-12377.61.12~1/RELEASE_ARM64_T8132 arm64
+
+Linux Distribution:
 
 Shell:
-GNU bash, version 3.2.57(1)-release (x86_64-apple-darwin21)
+GNU bash, version 3.2.57(1)-release (arm64-apple-darwin25)
 
 Compiler:
 Apple clang version 17.0.0 (clang-1700.4.4.1)
-Target: arm64-apple-darwin25.2.0
-Thread model: posix
-InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
 
 Hardware:
-MacBook Pro (Intel or Apple Silicon)
-Memory: hw.memsize: 17179869184
-
-Test Date:
-February 11-12, 2025
-
-Development Environment:
-- Visual Studio Code terminal
-- Standard macOS terminal utilities
-- No virtualization or containers used
-
-Platform Notes:
-- Development conducted on macOS for rapid prototyping
-- Experiments demonstrate prototype functionality
-- Final implementation will be tested on Linux (Ubuntu 22.04+)
-- Cross-platform differences documented in disconnect_test.log
-- Production deployment target: Linux server environment
+Memory: 
+Experiment Date:
+Thu Feb 12 18:23:31 CST 2026

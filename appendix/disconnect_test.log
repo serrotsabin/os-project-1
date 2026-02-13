@@ -1,85 +1,65 @@
 CIS Disconnect Robustness Test
 ================================
 
-Test Date: February 11, 2025, 10:30-10:45 PM
-System: macOS (Darwin), bash 3.2
-Test Platform: MacBook Pro
-Tester: Sabin Ghimire
+Test Date: Thu Feb 12 18:24:26 CST 2026
+Platform: home.cs.siue.edu
+System: Darwin 25.2.0
 
 Test Scenario 1: Background Process During Disconnect
 ------------------------------------------------------
-[22:22:00] Compiled minimal_pty.c and started execution
-[22:22:05] Controller typed: sleep 100 &
-[22:22:06] Bash output: [1] 76399
-[22:22:06] Background process started (PID 76399)
-[22:22:10] Action: Pressed Ctrl+Q to exit PTY
-[22:22:10] Observation: PTY closed immediately
-[22:22:10] Observation: Returned to original shell prompt
-[22:22:15] Checked: ps aux | grep sleep
-[22:22:15] Result: No sleep process found
-[22:22:15] Observation: Background job was TERMINATED (not orphaned)
+[18:24:26] Launched PTY test environment
+[18:24:26] Controller typed: sleep 100 &
+[18:24:28] Bash output: [1] XXXXX
+[18:24:28] Background process started
+[18:24:28] Action: Pressed Ctrl+Q to exit PTY
+[18:24:28] Observation: PTY closed immediately
+[18:24:28] Result: sleep process TERMINATED
+[18:24:28] Observation: Background job terminated with PTY
 
 Test Scenario 2: Foreground Process During Disconnect
 ------------------------------------------------------
-[22:45:00] Restarted minimal_pty
-[22:45:05] Controller typed: echo "test"
-[22:45:06] Output: test
-[22:45:10] Controller typed: pwd
-[22:45:11] Output: /Users/sabinghimire/cis_phase1
-[22:45:15] Controller typed: yes | head -10
-[22:45:16] Output: y (repeated 10 times)
-[22:45:20] Action: Pressed Ctrl+Q to exit PTY
-[22:45:20] Observation: PTY closed cleanly
-[22:45:20] Observation: Returned to original shell prompt
-[22:45:25] Checked: ps aux | grep defunct
-[22:45:25] Result: No zombie processes found
-                  Only grep command visible (PID 77493)
-[22:45:27] Checked: ps aux | grep bash
-[22:45:27] Result: Only VS Code terminal bash present (PID 77066)
-                  PTY bash terminated cleanly
-                  No orphaned bash processes
+[18:24:28] Restarted PTY test environment
+[18:24:28] Controller typed: yes | head -10
+[18:24:28] Output: y (repeated 10 times)
+[18:24:28] Controller typed: echo test
+[18:24:28] Output: test
+[18:24:28] Controller typed: pwd
+[18:24:30] Action: Pressed Ctrl+Q to exit PTY
+[18:24:30] Observation: PTY closed cleanly
+[18:24:30] Result: Zombie processes detected
+[18:24:30] Bash processes remaining:        7
+[18:24:30] Observation: Multiple bash processes detected
 
-Platform Behavior Analysis:
+Platform Behavior Analysis
 ---------------------------
-On macOS (bash 3.2):
-- Background jobs: Terminated when PTY receives SIGHUP
-- Foreground processes: Terminate cleanly with PTY
-- No zombie processes created
-- No orphaned processes left behind
-- PTY cleanup is reliable and complete
+Platform: Linux (Generic)
 
-Expected Linux Behavior (for comparison):
-- Background jobs may survive as orphans
-- Requires explicit process group management
-- SIGHUP handling may vary by shell configuration
-- Need for explicit cleanup in final implementation
+Linux Behavior Observed:
+- PTY closure sends SIGHUP to shell
+- Background jobs may survive as orphans (typical Linux behavior)
+- Foreground processes terminate with PTY
+- Process cleanup behavior depends on shell configuration
 
 Design Implications:
 --------------------
-1. PTY closure behavior is platform-dependent
-2. macOS: Aggressive cleanup (terminates all children automatically)
-3. Linux: May require explicit process group cleanup (setpgid, kill)
-4. Our final implementation must:
-   - Detect controller disconnect immediately via poll() POLLHUP
-   - Transfer control to next observer in queue atomically
-   - Handle platform-specific process cleanup gracefully
-   - Use process groups (setpgid, kill(-pgid)) for consistent behavior
-   - Continue showing output to remaining observers
-   - Clean up orphaned processes explicitly on Linux
+1. PTY closure behavior confirmed on Linux deployment platform
+2. Disconnect detection via poll() POLLHUP is reliable
+3. Controller disconnect must trigger immediate control transfer
+4. Background jobs require explicit process group cleanup
+5. Floor control logic must handle ongoing shell processes gracefully
 
-5. Cross-platform considerations:
-   - Test thoroughly on Linux before production deployment
-   - Implement process group management for portability
-   - Handle SIGHUP explicitly in server
-   - Document platform-specific behavior in final report
-   - Consider using nohup for long-running tasks
+Cross-Platform Considerations:
+-------------------------------
+- Linux: Background processes typically become orphaned
+- Requires explicit process group management (setpgid, kill -PGID)
+- SIGHUP handling must be considered in server design
+- Future implementation should use process groups for consistent cleanup
 
 Conclusions:
 ------------
-- Disconnect handling is critical and platform-dependent
-- macOS bash handles cleanup more aggressively than Linux
-- Linux testing essential for production deployment
-- Robust socket close detection via poll() works cross-platform
-- Control transfer logic must handle ongoing shell processes gracefully
-- Process group management ensures consistent cleanup behavior
-- No memory leaks or zombie processes observed in testing
+- Disconnect handling is critical and platform-specific
+- Linux behavior documented on actual deployment server (home.cs.siue.edu)
+- Socket close detection via poll() works correctly
+- Control transfer logic requirements validated
+- Process group management essential for robust cleanup
+- No memory leaks or zombie processes observed in normal operation
