@@ -1,65 +1,25 @@
-CIS Disconnect Robustness Test
-================================
+CIS Disconnect Robustness Test - Raw Data
+==========================================
 
-Test Date: Thu Feb 12 18:24:26 CST 2026
-Platform: home.cs.siue.edu
+Test Date: Thu Feb 12 19:12:33 CST 2026
+Platform: Sabins-MacBook-Pro.local
 System: Darwin 25.2.0
 
-Test Scenario 1: Background Process During Disconnect
-------------------------------------------------------
-[18:24:26] Launched PTY test environment
-[18:24:26] Controller typed: sleep 100 &
-[18:24:28] Bash output: [1] XXXXX
-[18:24:28] Background process started
-[18:24:28] Action: Pressed Ctrl+Q to exit PTY
-[18:24:28] Observation: PTY closed immediately
-[18:24:28] Result: sleep process TERMINATED
-[18:24:28] Observation: Background job terminated with PTY
+Test 1: Background Process During Disconnect
+---------------------------------------------
+[19:12:33] Starting PTY environment
+[19:12:33] Command: sleep 100 &
+[19:12:35] Output: [1] [PID]
+[19:12:35] Background job started
+[19:12:35] Action: Controller disconnected (Ctrl+Q)
+[19:12:35] Result: sleep process terminated
 
-Test Scenario 2: Foreground Process During Disconnect
-------------------------------------------------------
-[18:24:28] Restarted PTY test environment
-[18:24:28] Controller typed: yes | head -10
-[18:24:28] Output: y (repeated 10 times)
-[18:24:28] Controller typed: echo test
-[18:24:28] Output: test
-[18:24:28] Controller typed: pwd
-[18:24:30] Action: Pressed Ctrl+Q to exit PTY
-[18:24:30] Observation: PTY closed cleanly
-[18:24:30] Result: Zombie processes detected
-[18:24:30] Bash processes remaining:        7
-[18:24:30] Observation: Multiple bash processes detected
-
-Platform Behavior Analysis
----------------------------
-Platform: Linux (Generic)
-
-Linux Behavior Observed:
-- PTY closure sends SIGHUP to shell
-- Background jobs may survive as orphans (typical Linux behavior)
-- Foreground processes terminate with PTY
-- Process cleanup behavior depends on shell configuration
-
-Design Implications:
---------------------
-1. PTY closure behavior confirmed on Linux deployment platform
-2. Disconnect detection via poll() POLLHUP is reliable
-3. Controller disconnect must trigger immediate control transfer
-4. Background jobs require explicit process group cleanup
-5. Floor control logic must handle ongoing shell processes gracefully
-
-Cross-Platform Considerations:
--------------------------------
-- Linux: Background processes typically become orphaned
-- Requires explicit process group management (setpgid, kill -PGID)
-- SIGHUP handling must be considered in server design
-- Future implementation should use process groups for consistent cleanup
-
-Conclusions:
-------------
-- Disconnect handling is critical and platform-specific
-- Linux behavior documented on actual deployment server (home.cs.siue.edu)
-- Socket close detection via poll() works correctly
-- Control transfer logic requirements validated
-- Process group management essential for robust cleanup
-- No memory leaks or zombie processes observed in normal operation
+Test 2: Long-Running Command During Disconnect
+-----------------------------------------------
+[19:12:35] Starting PTY environment
+[19:12:35] Command: yes | head -100000
+[19:12:35] Output: y (streaming...)
+[19:12:37] Action: Controller disconnected (Ctrl+Q)
+[19:12:37] PTY closed
+[19:12:37] Zombie processes:        0
+[19:12:37] Bash processes:        8
